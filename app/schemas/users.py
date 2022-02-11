@@ -5,18 +5,24 @@ from pydantic import BaseModel, EmailStr
 
 # Base Schema for User
 class _UserBase(BaseModel):
+    username: Optional[str] = None
     email: Optional[EmailStr] = None
+    password: Optional[str] = None
     is_active: Optional[bool] = False
     is_superuser: Optional[bool] = False
-    username: Optional[str] = None
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
 
 
 class UserCreate(_UserBase):
     username: str
     email: EmailStr
     password: str
-    is_active: bool
-    is_superuser: bool
+    is_active: Optional[bool] = False
+    is_superuser: Optional[bool] = False
 
 
 class UserUpdate(_UserBase):
@@ -40,4 +46,4 @@ class User(_UserInDBBase):
 
 
 class UserInDB(_UserInDBBase):
-    hashed_password: str
+    password: str

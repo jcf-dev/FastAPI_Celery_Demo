@@ -1,5 +1,6 @@
 import secrets
 import os
+import time
 
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
@@ -28,7 +29,6 @@ class Settings(BaseSettings):
     GRAPHQL_APP: bool = False  # GraphQL APP Switch
 
     # Security Settings
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 60 minutes * 24 hours * 8 days = 8 days
     SECRET_KEY: str = secrets.token_urlsafe(32)
 
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
