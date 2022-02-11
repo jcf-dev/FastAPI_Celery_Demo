@@ -1,0 +1,90 @@
+version: "3.8"
+
+services:
+  db:
+    container_name: db
+    image: postgres:alpine
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    networks:
+      - app_network
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PG_ADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PG_ADMIN_PASS}
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    env_file:
+      - .env
+    ports:
+      - "1234:80"
+    depends_on:
+      - db
+    networks:
+      - app_network
+  app:
+    build: ./
+    container_name: app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app/:/src/app/
+      - ./.migrations/:/src/.migrations/
+    environment:
+      - MODULE_NAME=app.main
+      - VARIABLE_NAME=app
+      - PORT=8000
+      - WORKERS_PER_CORE=2
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - app_network
+  redis:
+    container_name: redis
+    image: redis:6.2-alpine
+    networks:
+      - app_network
+  worker:
+    container_name: worker
+    build:
+      context: .
+      dockerfile: Dockerfile.Celery
+    command: celery -A app.tasks.worker.celery worker --loglevel=info
+    volumes:
+      - ./app:/src/app/
+    env_file:
+      - .env
+    depends_on:
+      - app
+      - redis
+    networks:
+      - app_network
+  flower:
+    container_name: flower
+    build:
+      context: .
+      dockerfile: Dockerfile.Celery
+    command: celery -A app.tasks.worker.celery flower --port=5555
+    ports:
+      - "5556:5555"
+    env_file:
+      - .env
+    depends_on:
+      - app
+      - redis
+      - worker
+    networks:
+      - app_network
+networks:
+  app_network:
+    driver: bridge
+volumes:
+  db_data:
+  pgadmin_data:
