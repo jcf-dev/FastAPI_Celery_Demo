@@ -6,7 +6,7 @@ from app.tasks import generate_email_addresses
 router = APIRouter()
 
 
-@router.post("/")
+@router.post("/email_address", tags=['generators'], status_code=201)
 async def run_task(data=Body(...)):
     count = int(data["count"])
     task = generate_email_addresses.delay(count)

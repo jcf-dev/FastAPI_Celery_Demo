@@ -9,7 +9,7 @@ class _UserBase(BaseModel):
     email: Optional[EmailStr] = None
     password: Optional[str] = None
     is_active: Optional[bool] = False
-    is_superuser: Optional[bool] = False
+    is_superuser: bool = False
 
 
 class UserLogin(BaseModel):
@@ -21,16 +21,10 @@ class UserCreate(_UserBase):
     username: str
     email: EmailStr
     password: str
-    is_active: Optional[bool] = False
-    is_superuser: Optional[bool] = False
 
 
 class UserUpdate(_UserBase):
-    username: Optional[str] = None
-    email: Optional[EmailStr] = None
     password: Optional[str] = None
-    is_active: Optional[bool] = False
-    is_superuser: Optional[bool] = False
 
 
 # Base DB Schema for UserID

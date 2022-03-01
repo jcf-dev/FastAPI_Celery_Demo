@@ -1,9 +1,12 @@
-from .worker import celery
+from faker import Faker
+from app.tasks.worker import celery
+
+faker = Faker()
 
 
 @celery.task(name="generate_email_address")
 def generate_email_addresses(count: int):
-    email = []
+    emails = []
     for i in range(count):
-        email.append(f'Email {i} here!')
-    return email
+        emails.append(faker.ascii_company_email())
+    return emails
